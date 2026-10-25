@@ -1,4 +1,12 @@
-# DEVOUR Speedrun Timer（DLLインジェクト版）
+# DEVOUR Speedrun Timer
+
+> **English summary**
+> An in-game timer for DEVOUR that starts and stops automatically according to the speedrun.com rules.
+> - **Start:** the first horizontal movement of any player (normal maps), or the first player leaving the elevator/truck (Asylum / Slaughterhouse).
+> - **End:** the first frame the "10/10" overlay starts fading in after the 10th ritual.
+> - **Read-only:** it does not change gameplay, physics, AI, items, RNG or game speed. It reads player positions and the ritual-count text/opacity, and draws the timer on screen.
+> - **Install:** put `winhttp.dll` next to `DEVOUR.exe`. Delete it to uninstall. No game files are modified, and MelonLoader/BepInEx are not used.
+> - Timing uses real time (QueryPerformanceCounter). The rest of this README is in Japanese.
 
 DEVOUR の speedrun.com ルールどおりに計測し、ゲーム画面にタイマーを表示します。
 **MelonLoader 不要**。ゲームのフォルダには何も入れません。
@@ -109,7 +117,6 @@ VC++ ランタイムは静的リンクしているので、相手の PC に再�
 
 ## 注意
 
-- **走るときは MelonLoader 版のタイマーと ESP（`Mods\` の DLL）を外してください。** 両方入っていると F キーに両方が反応します
 - マルチプレイでは他人の位置は通信で届くので、他人が先に動いた場合は自分の画面で数十〜100ms程度開始が遅れることがあります。ホストのタイマーが最も正確です
 - ウイルス対策ソフトがインジェクターを誤検知することがあります（他プロセスに DLL を読み込ませる動作のため）
 - Windows が C ドライブ以外に入っている PC では、置くだけ版を入れるとゲームが起動しなくなるおそれがあります（転送先を `C:\Windows\System32` に固定しているため）。その場合は `winhttp.dll` を消して、インジェクト版を使ってください
