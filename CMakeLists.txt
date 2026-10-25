@@ -21,9 +21,16 @@ add_library(imgui STATIC
     ${IG}/backends/imgui_impl_dx11.cpp)
 target_include_directories(imgui PUBLIC ${IG} ${IG}/backends)
 
-# ---- 本体 DLL ----
-add_library(DevourTimerNative SHARED
-    src/dllmain.cpp src/il2cpp.cpp src/log.cpp src/overlay.cpp src/timer.cpp)
+# ---- 本体 ----
+set(TIMER_SOURCES src/dllmain.cpp src/il2cpp.cpp src/log.cpp src/overlay.cpp src/timer.cpp)
+
+# 置くだけ版: DEVOUR のフォルダに winhttp.dll として置くと、ゲーム起動時に自動で読み込まれる
+add_library(winhttp_proxy SHARED ${TIMER_SOURCES} src/winhttp_proxy.cpp)
+set_target_properties(winhttp_proxy PROPERTIES OUTPUT_NAME winhttp)
+target_link_libraries(winhttp_proxy PRIVATE minhook imgui d3d11 dxgi)
+
+# インジェクト版: DevourTimer.exe から読み込ませる
+add_library(DevourTimerNative SHARED ${TIMER_SOURCES})
 target_link_libraries(DevourTimerNative PRIVATE minhook imgui d3d11 dxgi)
 
 # ---- インジェクター ----
@@ -37,3 +44,7 @@ add_custom_command(TARGET DevourTimer POST_BUILD
 add_custom_command(TARGET DevourTimerNative POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E make_directory ${DIST}
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DevourTimerNative> ${DIST})
+# 置くだけ版は別フォルダに (exe と並べると紛らわしいので)
+add_custom_command(TARGET winhttp_proxy POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${DIST}/drop-in
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:winhttp_proxy> ${DIST}/drop-in)

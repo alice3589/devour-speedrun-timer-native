@@ -1,6 +1,7 @@
 // DevourTimer.exe (インジェクター) から DEVOUR.exe に読み込まれる本体。
 // DllMain の中では重い処理ができないので、別スレッドを立ててそこで準備する。
 #include <windows.h>
+#include <cwchar>
 #include <MinHook.h>
 
 #include "il2cpp.h"
@@ -65,7 +66,14 @@ BOOL APIENTRY DllMain(HMODULE module, DWORD reason, LPVOID)
     {
         g_self = module;
         DisableThreadLibraryCalls(module);
-        // 二重注入されても 2 回目は何もしない (ローダーが同じモジュールとして扱うので通常は起きない)
+
+        // winhttp.dll として置いたうえでインジェクターも使った場合など、
+        // 同じプロセスに 2 つ読み込まれたら 2 つ目は何もしない (フックが二重になるのを防ぐ)
+        wchar_t name[64];
+        swprintf(name, 64, L"Local\\DevourTimer_%lu", GetCurrentProcessId());
+        CreateMutexW(nullptr, FALSE, name);
+        if (GetLastError() == ERROR_ALREADY_EXISTS) return TRUE;
+
         CloseHandle(CreateThread(nullptr, 0, Setup, nullptr, 0, nullptr));
     }
     return TRUE;
