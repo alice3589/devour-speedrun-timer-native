@@ -4,12 +4,14 @@
 > An in-game timer for DEVOUR that starts and stops automatically according to the speedrun.com rules.
 > - **Start:** the first horizontal movement of any player (normal maps), or the first player leaving the elevator/truck (Asylum / Slaughterhouse).
 > - **End:** the first frame the "10/10" overlay starts fading in after the 10th ritual.
-> - **Read-only:** it does not change gameplay, physics, AI, items, RNG or game speed. It reads player positions and the ritual-count text/opacity, and draws the timer on screen.
+> - **Read-only:** it does not change gameplay, physics, AI, items, RNG or game speed. It reads player positions and the ritual-count text/opacity, and draws the timer on screen. To do this, it hooks game and rendering functions in memory (see the table under 仕組み).
 > - **Install:** put `winhttp.dll` next to `DEVOUR.exe`. Delete it to uninstall. No game files are modified, and MelonLoader/BepInEx are not used.
+> - **Verifying the download:** release builds are made by GitHub Actions from this public source. Run `gh attestation verify winhttp.dll -R alice3589/devour-speedrun-timer-native`.
+> - **Antivirus:** the DLL is unsigned and uses the name of a Windows DLL, so antivirus software may flag it. Do not disable your antivirus to use it; please report the detection name in an issue.
 > - Timing uses real time (QueryPerformanceCounter). The rest of this README is in Japanese.
 
 DEVOUR の speedrun.com ルールどおりに計測し、ゲーム画面にタイマーを表示します。
-**MelonLoader 不要**。ゲームのフォルダには何も入れません。
+**MelonLoader 不要**です。
 
 ## 使い方（おすすめ：置くだけ版）
 
@@ -112,12 +114,18 @@ cmake --build build --config Release
 `dist\drop-in\winhttp.dll`（置くだけ版）と、`dist\` に `DevourTimer.exe` + `DevourTimerNative.dll`（インジェクト版）ができます。
 VC++ ランタイムは静的リンクしているので、相手の PC に再頒布パッケージは要りません。
 
+リリース版は GitHub Actions（`.github/workflows/build.yml`）がタグのソースからビルドし、ビルド来歴の証明を付けます。配布された DLL がこのリポジトリのソースから作られたことは、次のコマンドで確認できます。
+
+```
+gh attestation verify winhttp.dll -R alice3589/devour-speedrun-timer-native
+```
+
 同梱ライブラリ: [MinHook](https://github.com/TsudaKageyu/minhook) v1.3.4（BSD-2）、
 [Dear ImGui](https://github.com/ocornut/imgui) v1.91.9（MIT）。`third_party/` にライセンスごと入っています。
 
 ## 注意
 
 - マルチプレイでは他人の位置は通信で届くので、他人が先に動いた場合は自分の画面で数十〜100ms程度開始が遅れることがあります。ホストのタイマーが最も正確です
-- ウイルス対策ソフトがインジェクターを誤検知することがあります（他プロセスに DLL を読み込ませる動作のため）
+- ウイルス対策ソフトが検出することがあります。この DLL は未署名で Windows の DLL と同じ名前を使い、メモリ上で関数をフックするためです。インジェクターも他プロセスに DLL を読み込ませるので同様です。**ウイルス対策を無効にしてまで使わないでください。** 検出されたら、検出名を Issue で教えてください
 - Windows が C ドライブ以外に入っている PC では、置くだけ版を入れるとゲームが起動しなくなるおそれがあります（転送先を `C:\Windows\System32` に固定しているため）。その場合は `winhttp.dll` を消して、インジェクト版を使ってください
-- 確認済み: 置くだけ版を Steam から普通に起動して自動で読み込まれること、全フックの成功、試合シーン（Farmhouse）の検出・プレイヤー検出・「0/10」の読み取り・描画。**実際のスタート・ゴールの瞬間はまだ未確認**
+- 確認済み: 置くだけ版を Steam から普通に起動して自動で読み込まれること、全フックの成功、試合シーン（Farmhouse）の検出・プレイヤー検出・移動でのスタート・「0/10」の読み取り・描画。**ゴールの瞬間と Asylum / Slaughterhouse のスタートはまだ未確認**

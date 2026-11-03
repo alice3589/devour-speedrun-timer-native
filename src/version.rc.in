@@ -1,0 +1,31 @@
+#include <winver.h>
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION     @PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,0
+PRODUCTVERSION  @PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,0
+FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
+FILEFLAGS       0
+FILEOS          VOS_NT_WINDOWS32
+FILETYPE        VFT_DLL
+FILESUBTYPE     VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName",      "alice3589"
+            VALUE "FileDescription",  "DEVOUR Speedrun Timer"
+            VALUE "FileVersion",      "@PROJECT_VERSION@"
+            VALUE "InternalName",     "DevourTimer"
+            VALUE "LegalCopyright",   "Copyright (C) 2026 alice3589"
+            VALUE "OriginalFilename", "@VERSION_FILE_NAME@"
+            VALUE "ProductName",      "DEVOUR Speedrun Timer"
+            VALUE "ProductVersion",   "@PROJECT_VERSION@"
+            VALUE "Comments",         "Unofficial game timer. Not a Microsoft component. Source: https://github.com/alice3589/devour-speedrun-timer-native"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0409, 1200
+    END
+END
